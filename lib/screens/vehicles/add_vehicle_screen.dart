@@ -5,7 +5,7 @@ import '../../services/vehicle_service.dart';
 import '../../config/supabase_config.dart';
 
 class AddVehicleScreen extends StatefulWidget {
-  final Vehicle? vehicle; // Düzenleme için
+  final Vehicle? vehicle;
 
   const AddVehicleScreen({super.key, this.vehicle});
 
@@ -130,151 +130,199 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
       appBar: AppBar(
         title: Text(_isEditing ? 'Aracı Düzenle' : 'Araç Ekle'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _plakaController,
-                textCapitalization: TextCapitalization.characters,
-                decoration: const InputDecoration(
-                  labelText: 'Plaka *',
-                  prefixIcon: Icon(Icons.confirmation_number),
-                  border: OutlineInputBorder(),
-                  hintText: '34 ABC 123',
-                ),
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Plaka gerekli' : null,
-              ),
-              const SizedBox(height: 16),
-              Row(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _markaController,
-                      decoration: const InputDecoration(
-                        labelText: 'Marka *',
-                        prefixIcon: Icon(Icons.branding_watermark),
-                        border: OutlineInputBorder(),
+                  // Araç bilgileri başlığı
+                  Text(
+                    'Araç Bilgileri',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Satır 1: Plaka - Marka - Model
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _plakaController,
+                          textCapitalization: TextCapitalization.characters,
+                          decoration: const InputDecoration(
+                            labelText: 'Plaka *',
+                            prefixIcon: Icon(Icons.confirmation_number),
+                            hintText: '34 ABC 123',
+                          ),
+                          validator: (v) =>
+                              v == null || v.isEmpty ? 'Plaka gerekli' : null,
+                        ),
                       ),
-                      validator: (v) =>
-                          v == null || v.isEmpty ? 'Marka gerekli' : null,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _markaController,
+                          decoration: const InputDecoration(
+                            labelText: 'Marka *',
+                            prefixIcon: Icon(Icons.branding_watermark),
+                          ),
+                          validator: (v) =>
+                              v == null || v.isEmpty ? 'Marka gerekli' : null,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _modelController,
+                          decoration: const InputDecoration(
+                            labelText: 'Model *',
+                            prefixIcon: Icon(Icons.model_training),
+                          ),
+                          validator: (v) =>
+                              v == null || v.isEmpty ? 'Model gerekli' : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Satır 2: Yıl - Renk - Kilometre
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _yilController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Yıl',
+                            prefixIcon: Icon(Icons.calendar_today),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _renkController,
+                          decoration: const InputDecoration(
+                            labelText: 'Renk',
+                            prefixIcon: Icon(Icons.color_lens),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _kilometreController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Kilometre',
+                            prefixIcon: Icon(Icons.speed),
+                            suffixText: 'km',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  // Finansal bilgiler başlığı
+                  Text(
+                    'Finansal Bilgiler',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Satır 3: Alış Fiyatı - Alış Tarihi
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _alisFiyatiController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Alış Fiyatı *',
+                            prefixIcon: Icon(Icons.payments),
+                            suffixText: '₺',
+                          ),
+                          validator: (v) => v == null || v.isEmpty
+                              ? 'Alış fiyatı gerekli'
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: InkWell(
+                          onTap: _selectDate,
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'Alış Tarihi',
+                              prefixIcon: Icon(Icons.date_range),
+                            ),
+                            child: Text(
+                              _alisTarihi != null
+                                  ? _dateFormat.format(_alisTarihi!)
+                                  : 'Tarih seçin',
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Expanded(child: SizedBox()),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  // Notlar
+                  Text(
+                    'Notlar',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _notlarController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Notlar',
+                      prefixIcon: Icon(Icons.notes),
+                      alignLabelWithHint: true,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _modelController,
-                      decoration: const InputDecoration(
-                        labelText: 'Model *',
-                        prefixIcon: Icon(Icons.model_training),
-                        border: OutlineInputBorder(),
+                  const SizedBox(height: 32),
+                  // Kaydet butonu
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                      width: 200,
+                      height: 48,
+                      child: FilledButton.icon(
+                        onPressed: _isLoading ? null : _save,
+                        icon: _isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Icon(_isEditing ? Icons.save : Icons.add),
+                        label: Text(
+                          _isEditing ? 'Güncelle' : 'Araç Ekle',
+                          style: const TextStyle(fontSize: 16),
+                        ),
                       ),
-                      validator: (v) =>
-                          v == null || v.isEmpty ? 'Model gerekli' : null,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _yilController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Yıl',
-                        prefixIcon: Icon(Icons.calendar_today),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _renkController,
-                      decoration: const InputDecoration(
-                        labelText: 'Renk',
-                        prefixIcon: Icon(Icons.color_lens),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _kilometreController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Kilometre',
-                  prefixIcon: Icon(Icons.speed),
-                  border: OutlineInputBorder(),
-                  suffixText: 'km',
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _alisFiyatiController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Alış Fiyatı *',
-                  prefixIcon: Icon(Icons.payments),
-                  border: OutlineInputBorder(),
-                  suffixText: '₺',
-                ),
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Alış fiyatı gerekli' : null,
-              ),
-              const SizedBox(height: 16),
-              InkWell(
-                onTap: _selectDate,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Alış Tarihi',
-                    prefixIcon: Icon(Icons.date_range),
-                    border: OutlineInputBorder(),
-                  ),
-                  child: Text(
-                    _alisTarihi != null
-                        ? _dateFormat.format(_alisTarihi!)
-                        : 'Tarih seçin',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _notlarController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Notlar',
-                  prefixIcon: Icon(Icons.notes),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _save,
-                  icon: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Icon(_isEditing ? Icons.save : Icons.add),
-                  label: Text(
-                    _isEditing ? 'Güncelle' : 'Araç Ekle',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

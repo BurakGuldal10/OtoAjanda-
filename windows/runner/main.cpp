@@ -27,10 +27,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
-  if (!window.Create(L"oto_galeri_app", origin, size)) {
+  if (!window.Create(L"GaleriPro - Galeri Yönetim Sistemi", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);
+
+  // Minimum pencere boyutu
+  HWND hwnd = window.GetHandle();
+  SetWindowLong(hwnd, GWL_STYLE,
+    GetWindowLong(hwnd, GWL_STYLE) | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX);
+
 
   ::MSG msg;
   while (::GetMessage(&msg, nullptr, 0, 0)) {

@@ -42,61 +42,149 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screens = [
-      _buildDashboard(),
-      const VehicleListScreen(),
-      const StatsScreen(),
-    ];
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Oto Galeri'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await _authService.signOut();
+      body: Row(
+        children: [
+          // Yan menü (NavigationRail)
+          NavigationRail(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              setState(() => _currentIndex = index);
+              if (index == 0) _loadStats();
             },
+            extended: MediaQuery.of(context).size.width > 1100,
+            minWidth: 72,
+            leading: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.directions_car,
+                    size: 36,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 8),
+                  if (MediaQuery.of(context).size.width > 1100)
+                    Text(
+                      'GaleriPro',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                ],
+              ),
+            ),
+            trailing: Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: IconButton(
+                    icon: const Icon(Icons.logout),
+                    tooltip: 'Çıkış Yap',
+                    onPressed: () async {
+                      await _authService.signOut();
+                    },
+                  ),
+                ),
+              ),
+            ),
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.dashboard_outlined),
+                selectedIcon: Icon(Icons.dashboard),
+                label: Text('Ana Sayfa'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.directions_car_outlined),
+                selectedIcon: Icon(Icons.directions_car),
+                label: Text('Araçlar'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.bar_chart_outlined),
+                selectedIcon: Icon(Icons.bar_chart),
+                label: Text('İstatistik'),
+              ),
+            ],
+          ),
+          const VerticalDivider(thickness: 1, width: 1),
+          // Ana içerik
+          Expanded(
+            child: Column(
+              children: [
+                // Üst bar
+                Container(
+                  height: 60,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        _getTitle(),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const Spacer(),
+                      if (_currentIndex == 0 || _currentIndex == 1)
+                        FilledButton.icon(
+                          onPressed: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const AddVehicleScreen()),
+                            );
+                            if (result == true) _loadStats();
+                          },
+                          icon: const Icon(Icons.add),
+                          label: const Text('Araç Ekle'),
+                        ),
+                    ],
+                  ),
+                ),
+                // İçerik alanı
+                Expanded(
+                  child: _buildContent(),
+                ),
+              ],
+            ),
           ),
         ],
-      ),
-      body: screens[_currentIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() => _currentIndex = index);
-          if (index == 0) _loadStats();
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
-            label: 'Ana Sayfa',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.directions_car_outlined),
-            selectedIcon: Icon(Icons.directions_car),
-            label: 'Araçlar',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
-            label: 'İstatistik',
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddVehicleScreen()),
-          );
-          if (result == true) _loadStats();
-        },
-        child: const Icon(Icons.add),
       ),
     );
+  }
+
+  String _getTitle() {
+    switch (_currentIndex) {
+      case 0:
+        return 'Ana Sayfa';
+      case 1:
+        return 'Araç Yönetimi';
+      case 2:
+        return 'İstatistikler';
+      default:
+        return '';
+    }
+  }
+
+  Widget _buildContent() {
+    switch (_currentIndex) {
+      case 0:
+        return _buildDashboard();
+      case 1:
+        return const VehicleListScreen();
+      case 2:
+        return const StatsScreen();
+      default:
+        return const SizedBox();
+    }
   }
 
   Widget _buildDashboard() {
@@ -104,10 +192,10 @@ class _HomeScreenState extends State<HomeScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadStats,
-      child: ListView(
-        padding: const EdgeInsets.all(16),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Hoş Geldiniz!',
@@ -116,6 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
           ),
           const SizedBox(height: 24),
+          // 4 stat kartı yan yana
           Row(
             children: [
               Expanded(
@@ -126,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Colors.blue,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: _buildStatCard(
                   'Satılan Araçlar',
@@ -135,11 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Colors.green,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
+              const SizedBox(width: 16),
               Expanded(
                 child: _buildStatCard(
                   'Toplam Kar',
@@ -148,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Colors.orange,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: _buildStatCard(
                   'Stok Yatırımı',
@@ -159,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           Text(
             'Hızlı İşlemler',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -167,26 +252,42 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
           ),
           const SizedBox(height: 12),
-          _buildQuickAction(
-            'Araç Ekle',
-            Icons.add_circle_outline,
-            () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AddVehicleScreen()),
-              );
-              if (result == true) _loadStats();
-            },
-          ),
-          _buildQuickAction(
-            'Tüm Araçları Gör',
-            Icons.list,
-            () => setState(() => _currentIndex = 1),
-          ),
-          _buildQuickAction(
-            'İstatistikleri Gör',
-            Icons.analytics,
-            () => setState(() => _currentIndex = 2),
+          Row(
+            children: [
+              Expanded(
+                child: _buildQuickActionCard(
+                  'Araç Ekle',
+                  Icons.add_circle_outline,
+                  Colors.indigo,
+                  () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const AddVehicleScreen()),
+                    );
+                    if (result == true) _loadStats();
+                  },
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildQuickActionCard(
+                  'Tüm Araçları Gör',
+                  Icons.list_alt,
+                  Colors.teal,
+                  () => setState(() => _currentIndex = 1),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildQuickActionCard(
+                  'İstatistikleri Gör',
+                  Icons.analytics,
+                  Colors.deepOrange,
+                  () => setState(() => _currentIndex = 2),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -198,12 +299,24 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 8),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: color, size: 24),
+                ),
+                const Spacer(),
+              ],
+            ),
+            const SizedBox(height: 12),
             Text(
               title,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -227,13 +340,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildQuickAction(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildQuickActionCard(
+      String title, IconData icon, Color color, VoidCallback onTap) {
     return Card(
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        trailing: const Icon(Icons.chevron_right),
+      elevation: 1,
+      child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              Icon(icon, size: 40, color: color),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

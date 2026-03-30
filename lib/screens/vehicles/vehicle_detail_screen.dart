@@ -58,47 +58,50 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           title: const Text('Aracı Sat'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: fiyatController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Satış Fiyatı',
-                  suffixText: '₺',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              InkWell(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: satisTarihi,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime.now(),
-                  );
-                  if (picked != null) {
-                    setDialogState(() => satisTarihi = picked);
-                  }
-                },
-                child: InputDecorator(
+          content: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: fiyatController,
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                    labelText: 'Satış Tarihi',
+                    labelText: 'Satış Fiyatı',
+                    suffixText: '₺',
                     border: OutlineInputBorder(),
                   ),
-                  child: Text(_dateFormat.format(satisTarihi)),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: satisTarihi,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now(),
+                    );
+                    if (picked != null) {
+                      setDialogState(() => satisTarihi = picked);
+                    }
+                  },
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Satış Tarihi',
+                      border: OutlineInputBorder(),
+                    ),
+                    child: Text(_dateFormat.format(satisTarihi)),
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text('İptal'),
             ),
-            ElevatedButton(
+            FilledButton(
               onPressed: () => Navigator.pop(context, true),
               child: const Text('Sat'),
             ),
@@ -135,50 +138,53 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           title: const Text('Gider Ekle'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                initialValue: selectedTur,
-                decoration: const InputDecoration(
-                  labelText: 'Gider Türü',
-                  border: OutlineInputBorder(),
+          content: SizedBox(
+            width: 400,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  value: selectedTur,
+                  decoration: const InputDecoration(
+                    labelText: 'Gider Türü',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'bakim', child: Text('Bakım')),
+                    DropdownMenuItem(value: 'boya', child: Text('Boya')),
+                    DropdownMenuItem(value: 'sigorta', child: Text('Sigorta')),
+                    DropdownMenuItem(value: 'vergi', child: Text('Vergi')),
+                    DropdownMenuItem(value: 'diger', child: Text('Diğer')),
+                  ],
+                  onChanged: (v) => setDialogState(() => selectedTur = v!),
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'bakim', child: Text('Bakım')),
-                  DropdownMenuItem(value: 'boya', child: Text('Boya')),
-                  DropdownMenuItem(value: 'sigorta', child: Text('Sigorta')),
-                  DropdownMenuItem(value: 'vergi', child: Text('Vergi')),
-                  DropdownMenuItem(value: 'diger', child: Text('Diğer')),
-                ],
-                onChanged: (v) => setDialogState(() => selectedTur = v!),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: tutarController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Tutar',
-                  suffixText: '₺',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: tutarController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Tutar',
+                    suffixText: '₺',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: aciklamaController,
-                decoration: const InputDecoration(
-                  labelText: 'Açıklama',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: aciklamaController,
+                  decoration: const InputDecoration(
+                    labelText: 'Açıklama',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text('İptal'),
             ),
-            ElevatedButton(
+            FilledButton(
               onPressed: () => Navigator.pop(context, true),
               child: const Text('Ekle'),
             ),
@@ -221,9 +227,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
             onPressed: () => Navigator.pop(context, false),
             child: const Text('İptal'),
           ),
-          ElevatedButton(
+          FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Sil'),
           ),
         ],
@@ -244,8 +250,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
       appBar: AppBar(
         title: Text('${_vehicle.marka} ${_vehicle.model}'),
         actions: [
-          IconButton(
+          TextButton.icon(
             icon: const Icon(Icons.edit),
+            label: const Text('Düzenle'),
             onPressed: () async {
               final result = await Navigator.push(
                 context,
@@ -253,160 +260,272 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                   builder: (_) => AddVehicleScreen(vehicle: _vehicle),
                 ),
               );
-              if (result == true) Navigator.pop(context, true);
+              if (result == true && mounted) Navigator.pop(context, true);
             },
           ),
-          IconButton(
+          const SizedBox(width: 8),
+          TextButton.icon(
             icon: const Icon(Icons.delete, color: Colors.red),
+            label: const Text('Sil', style: TextStyle(color: Colors.red)),
             onPressed: _deleteVehicle,
           ),
+          const SizedBox(width: 16),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Araç bilgileri kartı
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _buildInfoRow('Plaka', _vehicle.plaka),
-                    _buildInfoRow('Marka', _vehicle.marka),
-                    _buildInfoRow('Model', _vehicle.model),
-                    if (_vehicle.yil != null)
-                      _buildInfoRow('Yıl', _vehicle.yil.toString()),
-                    if (_vehicle.renk != null)
-                      _buildInfoRow('Renk', _vehicle.renk!),
-                    if (_vehicle.kilometre != null)
-                      _buildInfoRow(
-                          'Kilometre', '${_vehicle.kilometre} km'),
-                    _buildInfoRow('Durum', isSold ? 'Satıldı' : 'Stokta'),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Finansal bilgiler
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Finansal Bilgiler',
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const Divider(),
-                    _buildInfoRow('Alış Fiyatı',
-                        _currencyFormat.format(_vehicle.alisFiyati)),
-                    if (_vehicle.alisTarihi != null)
-                      _buildInfoRow(
-                          'Alış Tarihi', _dateFormat.format(_vehicle.alisTarihi!)),
-                    if (isSold && _vehicle.satisFiyati != null)
-                      _buildInfoRow('Satış Fiyatı',
-                          _currencyFormat.format(_vehicle.satisFiyati)),
-                    if (_vehicle.satisTarihi != null)
-                      _buildInfoRow('Satış Tarihi',
-                          _dateFormat.format(_vehicle.satisTarihi!)),
-                    if (_vehicle.kar != null)
-                      _buildInfoRow(
-                        'Brüt Kar',
-                        _currencyFormat.format(_vehicle.kar),
-                        valueColor:
-                            _vehicle.kar! >= 0 ? Colors.green : Colors.red,
-                      ),
-                    _buildInfoRow(
-                        'Toplam Gider', _currencyFormat.format(_totalExpenses)),
-                    if (isSold)
-                      _buildInfoRow(
-                        'Net Kar',
-                        _currencyFormat.format(_netKar),
-                        valueColor: _netKar >= 0 ? Colors.green : Colors.red,
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Giderler
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Giderler',
-                    style: Theme.of(context).textTheme.titleMedium),
-                TextButton.icon(
-                  onPressed: _addExpense,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Gider Ekle'),
-                ),
-              ],
-            ),
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (_expenses.isEmpty)
-              const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Center(child: Text('Henüz gider eklenmemiş')),
-                ),
-              )
-            else
-              ..._expenses.map((e) => Card(
-                    child: ListTile(
-                      leading: Icon(_getExpenseIcon(e.tur)),
-                      title: Text(_getExpenseLabel(e.tur)),
-                      subtitle: e.aciklama != null ? Text(e.aciklama!) : null,
-                      trailing: Text(
-                        _currencyFormat.format(e.tutar),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
+                // Sol sütun: Araç bilgileri + Finansal
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    children: [
+                      // Araç bilgileri kartı
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.directions_car,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  const SizedBox(width: 8),
+                                  Text('Araç Bilgileri',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              const Divider(),
+                              _buildInfoRow('Plaka', _vehicle.plaka),
+                              _buildInfoRow('Marka', _vehicle.marka),
+                              _buildInfoRow('Model', _vehicle.model),
+                              if (_vehicle.yil != null)
+                                _buildInfoRow('Yıl', _vehicle.yil.toString()),
+                              if (_vehicle.renk != null)
+                                _buildInfoRow('Renk', _vehicle.renk!),
+                              if (_vehicle.kilometre != null)
+                                _buildInfoRow(
+                                    'Kilometre', '${_vehicle.kilometre} km'),
+                              _buildInfoRow(
+                                  'Durum', isSold ? 'Satıldı' : 'Stokta'),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  )),
-
-            if (_vehicle.notlar != null) ...[
-              const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Notlar',
-                          style: Theme.of(context).textTheme.titleMedium),
-                      const Divider(),
-                      Text(_vehicle.notlar!),
+                      const SizedBox(height: 16),
+                      // Finansal bilgiler kartı
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.payments,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  const SizedBox(width: 8),
+                                  Text('Finansal Bilgiler',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              const Divider(),
+                              _buildInfoRow('Alış Fiyatı',
+                                  _currencyFormat.format(_vehicle.alisFiyati)),
+                              if (_vehicle.alisTarihi != null)
+                                _buildInfoRow('Alış Tarihi',
+                                    _dateFormat.format(_vehicle.alisTarihi!)),
+                              if (isSold && _vehicle.satisFiyati != null)
+                                _buildInfoRow('Satış Fiyatı',
+                                    _currencyFormat.format(_vehicle.satisFiyati)),
+                              if (_vehicle.satisTarihi != null)
+                                _buildInfoRow('Satış Tarihi',
+                                    _dateFormat.format(_vehicle.satisTarihi!)),
+                              if (_vehicle.kar != null)
+                                _buildInfoRow(
+                                  'Brüt Kar',
+                                  _currencyFormat.format(_vehicle.kar),
+                                  valueColor: _vehicle.kar! >= 0
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                              _buildInfoRow('Toplam Gider',
+                                  _currencyFormat.format(_totalExpenses)),
+                              if (isSold)
+                                _buildInfoRow(
+                                  'Net Kar',
+                                  _currencyFormat.format(_netKar),
+                                  valueColor:
+                                      _netKar >= 0 ? Colors.green : Colors.red,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Satış butonu
+                      if (!isSold)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: FilledButton.icon(
+                            onPressed: _sellVehicle,
+                            icon: const Icon(Icons.sell),
+                            label: const Text('Bu Aracı Sat',
+                                style: TextStyle(fontSize: 16)),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                          ),
+                        ),
+                      // Notlar
+                      if (_vehicle.notlar != null) ...[
+                        const SizedBox(height: 16),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.notes,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                    const SizedBox(width: 8),
+                                    Text('Notlar',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                                fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                const Divider(),
+                                Text(_vehicle.notlar!),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-              ),
-            ],
-
-            const SizedBox(height: 24),
-
-            // Satış butonu
-            if (!isSold)
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: _sellVehicle,
-                  icon: const Icon(Icons.sell),
-                  label: const Text('Bu Aracı Sat',
-                      style: TextStyle(fontSize: 16)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
+                const SizedBox(width: 24),
+                // Sağ sütun: Giderler
+                Expanded(
+                  flex: 2,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.receipt_long,
+                                  color:
+                                      Theme.of(context).colorScheme.primary),
+                              const SizedBox(width: 8),
+                              Text('Giderler',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          fontWeight: FontWeight.bold)),
+                              const Spacer(),
+                              FilledButton.tonalIcon(
+                                onPressed: _addExpense,
+                                icon: const Icon(Icons.add, size: 18),
+                                label: const Text('Ekle'),
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          if (_isLoading)
+                            const Center(
+                                child: Padding(
+                              padding: EdgeInsets.all(24),
+                              child: CircularProgressIndicator(),
+                            ))
+                          else if (_expenses.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(24),
+                              child: Center(
+                                  child: Text('Henüz gider eklenmemiş')),
+                            )
+                          else
+                            ..._expenses.map((e) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 4),
+                                  child: ListTile(
+                                    dense: true,
+                                    leading: Icon(_getExpenseIcon(e.tur)),
+                                    title: Text(_getExpenseLabel(e.tur)),
+                                    subtitle: e.aciklama != null
+                                        ? Text(e.aciklama!)
+                                        : null,
+                                    trailing: Text(
+                                      _currencyFormat.format(e.tutar),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                          if (_expenses.isNotEmpty) ...[
+                            const Divider(),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Toplam',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15)),
+                                  Text(
+                                    _currencyFormat.format(_totalExpenses),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -414,7 +533,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
 
   Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
