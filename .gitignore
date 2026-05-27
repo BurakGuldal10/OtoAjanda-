@@ -42,6 +42,9 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+
+# Inno Setup kurulum çıktısı (üretilen setup.exe'ler)
+/installer/Output/
 *.g.dart
 *.freezed.dart
 
