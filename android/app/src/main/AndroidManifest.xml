@@ -1,4 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        Android 9 (API 28) ve altı için harici depolama yazma izni.
+        Android 10+ (API 29+) için uygulama özel harici dizin izinsiz yazılabilir.
+    -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
     <application
         android:label="oto_galeri_app"
         android:name="${applicationName}"

@@ -34,11 +34,14 @@ class Expense {
     );
   }
 
-  Map<String, dynamic> toJson() {
+  /// Veritabanı payload'ı üretir.
+  /// `forUpdate: true` ise `id`, `user_id` ve `vehicle_id` (sahiplik alanları)
+  /// payload'a eklenmez — bunlar update sırasında değişmemelidir.
+  Map<String, dynamic> toJson({bool forUpdate = false}) {
     return {
-      if (id != null) 'id': id,
-      'vehicle_id': vehicleId,
-      'user_id': userId,
+      if (!forUpdate && id != null) 'id': id,
+      if (!forUpdate) 'vehicle_id': vehicleId,
+      if (!forUpdate) 'user_id': userId,
       'tur': tur,
       'tutar': tutar,
       'aciklama': aciklama,

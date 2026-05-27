@@ -1,20 +1,25 @@
-<<<<<<< HEAD
-# oto_galeri_app
+# GaleriPro
 
-A new Flutter project.
+Oto galeri sahipleri için araç alım-satım takip ve yönetim uygulaması.  
+Öncelikli platform **Windows masaüstü**, ilerleyen aşamalarda Android/iOS/Web desteği eklenecek.
 
-## Getting Started
+## Kurulum
 
-This project is a starting point for a Flutter application.
+```bash
+# Bağımlılıkları yükle
+flutter pub get
 
-A few resources to get you started if this is your first Flutter project:
+# .env dosyasını oluştur (.env.example'ı kopyala)
+copy .env.example .env
+# Supabase URL ve anon key'i .env dosyasına gir
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+# Uygulamayı çalıştır
+flutter run -d windows
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-=======
-# OtoAjanda-
->>>>>>> b2d7fba80b783fcd7ffcb4f239afa7fd150757df
+## Özellikler
+
+- Araç alım-satım kaydı ve durum takibi (Stokta / Rezerve / Satıldı)
+- Araç bazlı gider takibi ve net kâr hesabı
+- Dashboard, araç listesi ve istatistik ekranları
+- Supabase ile bulut yedekleme — tüm veriler güvende
