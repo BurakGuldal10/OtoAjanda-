@@ -31,7 +31,8 @@ class LocalBackupService {
       // Android: harici uygulama dizini — dosya yöneticisinde görünür,
       // API 29+ için izin gerekmez (uygulama özel alan).
       // Harici depolama yoksa (emülatör vb.) dahili dizine düşer.
-      baseDir = (await getExternalStorageDirectory()) ??
+      baseDir =
+          (await getExternalStorageDirectory()) ??
           await getApplicationDocumentsDirectory();
     } else {
       // iOS     : Files uygulamasından erişilebilir (Info.plist ile etkinleştirildi)
@@ -72,10 +73,12 @@ class LocalBackupService {
           .eq('user_id', userId)
           .order('tarih', ascending: false);
 
-      final vehicles =
-          (vehiclesRaw as List).map((e) => Vehicle.fromJson(e)).toList();
-      final expenses =
-          (expensesRaw as List).map((e) => Expense.fromJson(e)).toList();
+      final vehicles = (vehiclesRaw as List)
+          .map((e) => Vehicle.fromJson(e))
+          .toList();
+      final expenses = (expensesRaw as List)
+          .map((e) => Expense.fromJson(e))
+          .toList();
 
       await _writeSnapshot(
         userId: userId,
@@ -104,36 +107,46 @@ class LocalBackupService {
       'aracSayisi': vehicles.length,
       'giderSayisi': expenses.length,
       'araclar': vehicles
-          .map((v) => {
-                'id': v.id,
-                'kullaniciId': v.userId,
-                'plaka': v.plaka,
-                'marka': v.marka,
-                'model': v.model,
-                'yil': v.yil,
-                'renk': v.renk,
-                'kilometre': v.kilometre,
-                'alisFiyati': v.alisFiyati,
-                'alisTarihi': v.alisTarihi?.toIso8601String(),
-                'satisFiyati': v.satisFiyati,
-                'satisTarihi': v.satisTarihi?.toIso8601String(),
-                'kar': v.kar,
-                'durum': v.durum,
-                'notlar': v.notlar,
-                'olusturmaTarihi': v.createdAt?.toIso8601String(),
-              })
+          .map(
+            (v) => {
+              'id': v.id,
+              'kullaniciId': v.userId,
+              'plaka': v.plaka,
+              'marka': v.marka,
+              'model': v.model,
+              'yil': v.yil,
+              'renk': v.renk,
+              'kilometre': v.kilometre,
+              'alisFiyati': v.alisFiyati,
+              'alisTarihi': v.alisTarihi?.toIso8601String(),
+              'satisFiyati': v.satisFiyati,
+              'satisTarihi': v.satisTarihi?.toIso8601String(),
+              'kar': v.kar,
+              'durum': v.durum,
+              'notlar': v.notlar,
+              'saticiAdi': v.saticiAdi,
+              'saticiTelefon': v.saticiTelefon,
+              'saticiAdres': v.saticiAdres,
+              'aliciAdi': v.aliciAdi,
+              'aliciTelefon': v.aliciTelefon,
+              'aliciAdres': v.aliciAdres,
+              'olusturmaTarihi': v.createdAt?.toIso8601String(),
+            },
+          )
           .toList(),
       'giderler': expenses
-          .map((e) => {
-                'id': e.id,
-                'aracId': e.vehicleId,
-                'kullaniciId': e.userId,
-                'tur': e.tur,
-                'tutar': e.tutar,
-                'aciklama': e.aciklama,
-                'tarih': e.tarih?.toIso8601String(),
-                'olusturmaTarihi': e.createdAt?.toIso8601String(),
-              })
+          .map(
+            (e) => {
+              'id': e.id,
+              'aracId': e.vehicleId,
+              'kullaniciId': e.userId,
+              'tur': e.tur,
+              'tutar': e.tutar,
+              'aciklama': e.aciklama,
+              'tarih': e.tarih?.toIso8601String(),
+              'olusturmaTarihi': e.createdAt?.toIso8601String(),
+            },
+          )
           .toList(),
     };
 

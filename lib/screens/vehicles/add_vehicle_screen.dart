@@ -7,6 +7,7 @@ import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
 import '../../config/supabase_config.dart';
 import '../../utils/error_handler.dart';
+import '../../utils/format_utils.dart';
 import '../../widgets/brand_picker.dart';
 import '../../widgets/model_picker.dart';
 import '../../widgets/car_logo_widget.dart';
@@ -52,19 +53,20 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
     _plakaController = TextEditingController(text: v?.plaka ?? '');
     _markaController = TextEditingController(text: v?.marka ?? '');
     _modelController = TextEditingController(text: v?.model ?? '');
-    _yilController =
-        TextEditingController(text: v?.yil?.toString() ?? '');
+    _yilController = TextEditingController(text: v?.yil?.toString() ?? '');
     _renkController = TextEditingController(text: v?.renk ?? '');
-    _kilometreController =
-        TextEditingController(text: v?.kilometre?.toString() ?? '');
-    _alisFiyatiController =
-        TextEditingController(text: v?.alisFiyati.toString() ?? '');
+    _kilometreController = TextEditingController(
+      text: v?.kilometre?.toString() ?? '',
+    );
+    _alisFiyatiController = TextEditingController(
+      text: v?.alisFiyati.toString() ?? '',
+    );
     _notlarController = TextEditingController(text: v?.notlar ?? '');
     _saticiAdiController = TextEditingController(text: v?.saticiAdi ?? '');
-    _saticiTelefonController =
-        TextEditingController(text: v?.saticiTelefon ?? '');
-    _saticiAdresController =
-        TextEditingController(text: v?.saticiAdres ?? '');
+    _saticiTelefonController = TextEditingController(
+      text: v?.saticiTelefon ?? '',
+    );
+    _saticiAdresController = TextEditingController(text: v?.saticiAdres ?? '');
     _alisTarihi = v?.alisTarihi;
     _durum = v?.durum ?? 'stokta';
   }
@@ -93,9 +95,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(context)
-              .colorScheme
-              .copyWith(primary: AppTheme.primary),
+          colorScheme: Theme.of(
+            context,
+          ).colorScheme.copyWith(primary: AppTheme.primary),
         ),
         child: child!,
       ),
@@ -112,8 +114,10 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
     try {
       final userId = SupabaseConfig.client.auth.currentUser?.id;
       if (userId == null) {
-        setState(() => _errorMessage =
-            'Oturumunuz bulunamadı. Uygulamayı kapatıp tekrar giriş yapın.');
+        setState(
+          () => _errorMessage =
+              'Oturumunuz bulunamadı. Uygulamayı kapatıp tekrar giriş yapın.',
+        );
         return;
       }
 
@@ -133,7 +137,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
             ? int.tryParse(_kilometreController.text)
             : null,
         alisTarihi: _alisTarihi,
-        alisFiyati: double.tryParse(_alisFiyatiController.text) ?? 0,
+        alisFiyati: tutarCevir(_alisFiyatiController.text) ?? 0,
         durum: _isSold ? 'satildi' : _durum,
         notlar: _notlarController.text.trim().isNotEmpty
             ? _notlarController.text.trim()
@@ -156,8 +160,12 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (mounted) {
-        setState(() => _errorMessage = AppError.from(e,
-            ctx: _isEditing ? 'Araç güncellenemedi' : 'Araç kaydedilemedi'));
+        setState(
+          () => _errorMessage = AppError.from(
+            e,
+            ctx: _isEditing ? 'Araç güncellenemedi' : 'Araç kaydedilemedi',
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -174,8 +182,11 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
         scrolledUnderElevation: 1,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded,
-              color: AppTheme.textPrimary, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: AppTheme.textPrimary,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -231,8 +242,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                           controller: _plakaController,
                           textCapitalization: TextCapitalization.characters,
                           decoration: _decoration(
-                              '34 ABC 123',
-                              Icons.confirmation_number_outlined),
+                            '34 ABC 123',
+                            Icons.confirmation_number_outlined,
+                          ),
                           validator: (v) =>
                               v == null || v.isEmpty ? 'Plaka gerekli' : null,
                         ),
@@ -249,7 +261,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                             icon: Icons.branding_watermark_outlined,
                             leading: _markaController.text.isNotEmpty
                                 ? CarLogoWidget(
-                                    marka: _markaController.text, size: 22)
+                                    marka: _markaController.text,
+                                    size: 22,
+                                  )
                                 : null,
                             onTap: () async {
                               final brand = await showBrandPicker(context);
@@ -260,9 +274,8 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                 });
                               }
                             },
-                            validator: (v) => v == null || v.isEmpty
-                                ? 'Marka gerekli'
-                                : null,
+                            validator: (v) =>
+                                v == null || v.isEmpty ? 'Marka gerekli' : null,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -278,65 +291,74 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                               if (brand.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Önce marka seçin',
-                                        style: GoogleFonts.inter(fontSize: 13)),
+                                    content: Text(
+                                      'Önce marka seçin',
+                                      style: GoogleFonts.inter(fontSize: 13),
+                                    ),
                                     backgroundColor: AppTheme.warning,
                                     behavior: SnackBarBehavior.floating,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8)),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
                                 );
                                 return;
                               }
-                              final model =
-                                  await showModelPicker(context, brand);
+                              final model = await showModelPicker(
+                                context,
+                                brand,
+                              );
                               if (model != null) {
                                 setState(() => _modelController.text = model);
                               }
                             },
-                            validator: (v) => v == null || v.isEmpty
-                                ? 'Model gerekli'
-                                : null,
+                            validator: (v) =>
+                                v == null || v.isEmpty ? 'Model gerekli' : null,
                           ),
                         ),
                         const SizedBox(height: 16),
-                        Row(children: [
-                          Expanded(
-                            child: _buildField(
-                              label: 'Yıl',
-                              child: TextFormField(
-                                controller: _yilController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(4),
-                                ],
-                                decoration: _decoration(
-                                    '2020', Icons.calendar_today_outlined),
-                                validator: (v) {
-                                  if (v == null || v.isEmpty) return null;
-                                  final y = int.tryParse(v);
-                                  if (y == null || y < 1900 || y > 2100) {
-                                    return 'Geçerli yıl girin';
-                                  }
-                                  return null;
-                                },
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildField(
+                                label: 'Yıl',
+                                child: TextFormField(
+                                  controller: _yilController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(4),
+                                  ],
+                                  decoration: _decoration(
+                                    '2020',
+                                    Icons.calendar_today_outlined,
+                                  ),
+                                  validator: (v) {
+                                    if (v == null || v.isEmpty) return null;
+                                    final y = int.tryParse(v);
+                                    if (y == null || y < 1900 || y > 2100) {
+                                      return 'Geçerli yıl girin';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildField(
-                              label: 'Renk',
-                              child: TextFormField(
-                                controller: _renkController,
-                                decoration: _decoration('Beyaz, Siyah...',
-                                    Icons.color_lens_outlined),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildField(
+                                label: 'Renk',
+                                child: TextFormField(
+                                  controller: _renkController,
+                                  decoration: _decoration(
+                                    'Beyaz, Siyah...',
+                                    Icons.color_lens_outlined,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ]),
+                          ],
+                        ),
                         const SizedBox(height: 16),
                         _buildField(
                           label: 'Kilometre',
@@ -346,9 +368,10 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
-                            decoration:
-                                _decoration('45000', Icons.speed_outlined)
-                                    .copyWith(suffixText: 'km'),
+                            decoration: _decoration(
+                              '45000',
+                              Icons.speed_outlined,
+                            ).copyWith(suffixText: 'km'),
                             validator: (v) {
                               if (v == null || v.isEmpty) return null;
                               if (int.tryParse(v) == null) {
@@ -360,134 +383,157 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                         ),
                       ] else ...[
                         // Masaüstü: Marka - Model yan yana
-                        Row(children: [
-                          Expanded(
-                            child: _buildField(
-                              label: 'Marka',
-                              required: true,
-                              child: _buildPickerField(
-                                controller: _markaController,
-                                hint: 'Toyota, BMW...',
-                                icon: Icons.branding_watermark_outlined,
-                                leading: _markaController.text.isNotEmpty
-                                    ? CarLogoWidget(
-                                        marka: _markaController.text, size: 22)
-                                    : null,
-                                onTap: () async {
-                                  final brand = await showBrandPicker(context);
-                                  if (brand != null) {
-                                    setState(() {
-                                      _markaController.text = brand;
-                                      _modelController.clear();
-                                    });
-                                  }
-                                },
-                                validator: (v) => v == null || v.isEmpty
-                                    ? 'Marka gerekli'
-                                    : null,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildField(
-                              label: 'Model',
-                              required: true,
-                              child: _buildPickerField(
-                                controller: _modelController,
-                                hint: 'Corolla, 3 Serisi...',
-                                icon: Icons.model_training_outlined,
-                                onTap: () async {
-                                  final brand = _markaController.text.trim();
-                                  if (brand.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Önce marka seçin',
-                                            style: GoogleFonts.inter(
-                                                fontSize: 13)),
-                                        backgroundColor: AppTheme.warning,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8)),
-                                      ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildField(
+                                label: 'Marka',
+                                required: true,
+                                child: _buildPickerField(
+                                  controller: _markaController,
+                                  hint: 'Toyota, BMW...',
+                                  icon: Icons.branding_watermark_outlined,
+                                  leading: _markaController.text.isNotEmpty
+                                      ? CarLogoWidget(
+                                          marka: _markaController.text,
+                                          size: 22,
+                                        )
+                                      : null,
+                                  onTap: () async {
+                                    final brand = await showBrandPicker(
+                                      context,
                                     );
-                                    return;
-                                  }
-                                  final model =
-                                      await showModelPicker(context, brand);
-                                  if (model != null) {
-                                    setState(
-                                        () => _modelController.text = model);
-                                  }
-                                },
-                                validator: (v) => v == null || v.isEmpty
-                                    ? 'Model gerekli'
-                                    : null,
+                                    if (brand != null) {
+                                      setState(() {
+                                        _markaController.text = brand;
+                                        _modelController.clear();
+                                      });
+                                    }
+                                  },
+                                  validator: (v) => v == null || v.isEmpty
+                                      ? 'Marka gerekli'
+                                      : null,
+                                ),
                               ),
                             ),
-                          ),
-                        ]),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildField(
+                                label: 'Model',
+                                required: true,
+                                child: _buildPickerField(
+                                  controller: _modelController,
+                                  hint: 'Corolla, 3 Serisi...',
+                                  icon: Icons.model_training_outlined,
+                                  onTap: () async {
+                                    final brand = _markaController.text.trim();
+                                    if (brand.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Önce marka seçin',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          backgroundColor: AppTheme.warning,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    final model = await showModelPicker(
+                                      context,
+                                      brand,
+                                    );
+                                    if (model != null) {
+                                      setState(
+                                        () => _modelController.text = model,
+                                      );
+                                    }
+                                  },
+                                  validator: (v) => v == null || v.isEmpty
+                                      ? 'Model gerekli'
+                                      : null,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 16),
-                        Row(children: [
-                          Expanded(
-                            child: _buildField(
-                              label: 'Yıl',
-                              child: TextFormField(
-                                controller: _yilController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(4),
-                                ],
-                                decoration: _decoration(
-                                    '2020', Icons.calendar_today_outlined),
-                                validator: (v) {
-                                  if (v == null || v.isEmpty) return null;
-                                  final y = int.tryParse(v);
-                                  if (y == null || y < 1900 || y > 2100) {
-                                    return 'Geçerli yıl girin';
-                                  }
-                                  return null;
-                                },
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildField(
+                                label: 'Yıl',
+                                child: TextFormField(
+                                  controller: _yilController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(4),
+                                  ],
+                                  decoration: _decoration(
+                                    '2020',
+                                    Icons.calendar_today_outlined,
+                                  ),
+                                  validator: (v) {
+                                    if (v == null || v.isEmpty) return null;
+                                    final y = int.tryParse(v);
+                                    if (y == null || y < 1900 || y > 2100) {
+                                      return 'Geçerli yıl girin';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildField(
-                              label: 'Renk',
-                              child: TextFormField(
-                                controller: _renkController,
-                                decoration: _decoration('Beyaz, Siyah...',
-                                    Icons.color_lens_outlined),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildField(
+                                label: 'Renk',
+                                child: TextFormField(
+                                  controller: _renkController,
+                                  decoration: _decoration(
+                                    'Beyaz, Siyah...',
+                                    Icons.color_lens_outlined,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildField(
-                              label: 'Kilometre',
-                              child: TextFormField(
-                                controller: _kilometreController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                decoration:
-                                    _decoration('45000', Icons.speed_outlined)
-                                        .copyWith(suffixText: 'km'),
-                                validator: (v) {
-                                  if (v == null || v.isEmpty) return null;
-                                  if (int.tryParse(v) == null) {
-                                    return 'Geçerli sayı girin';
-                                  }
-                                  return null;
-                                },
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildField(
+                                label: 'Kilometre',
+                                child: TextFormField(
+                                  controller: _kilometreController,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  decoration: _decoration(
+                                    '45000',
+                                    Icons.speed_outlined,
+                                  ).copyWith(suffixText: 'km'),
+                                  validator: (v) {
+                                    if (v == null || v.isEmpty) return null;
+                                    if (int.tryParse(v) == null) {
+                                      return 'Geçerli sayı girin';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                        ]),
+                          ],
+                        ),
                       ],
                     ],
                   ),
@@ -504,23 +550,25 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                           required: true,
                           child: TextFormField(
                             controller: _alisFiyatiController,
-                            keyboardType:
-                                const TextInputType.numberWithOptions(
-                                    decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d*\.?\d*')),
+                                RegExp(r'^\d*\.?\d*'),
+                              ),
                             ],
-                            decoration:
-                                _decoration('250000', Icons.payments_outlined)
-                                    .copyWith(suffixText: '₺'),
+                            decoration: _decoration(
+                              '250000',
+                              Icons.payments_outlined,
+                            ).copyWith(suffixText: '₺'),
                             validator: (v) {
                               if (v == null || v.isEmpty) {
                                 return 'Alış fiyatı gerekli';
                               }
-                              final f = double.tryParse(v);
-                              if (f == null || f < 0) {
-                                return 'Geçerli fiyat girin';
+                              final f = tutarCevir(v);
+                              if (f == null || f <= 0) {
+                                return '0’dan büyük fiyat girin';
                               }
                               return null;
                             },
@@ -534,7 +582,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                             borderRadius: BorderRadius.circular(10),
                             child: InputDecorator(
                               decoration: _decoration(
-                                  'Tarih seçin', Icons.date_range_outlined),
+                                'Tarih seçin',
+                                Icons.date_range_outlined,
+                              ),
                               child: Text(
                                 _alisTarihi != null
                                     ? _dateFormat.format(_alisTarihi!)
@@ -550,63 +600,70 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                           ),
                         ),
                       ] else
-                        Row(children: [
-                          Expanded(
-                            child: _buildField(
-                              label: 'Alış Fiyatı',
-                              required: true,
-                              child: TextFormField(
-                                controller: _alisFiyatiController,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'^\d*\.?\d*')),
-                                ],
-                                decoration:
-                                    _decoration('250000', Icons.payments_outlined)
-                                        .copyWith(suffixText: '₺'),
-                                validator: (v) {
-                                  if (v == null || v.isEmpty) {
-                                    return 'Alış fiyatı gerekli';
-                                  }
-                                  final f = double.tryParse(v);
-                                  if (f == null || f < 0) {
-                                    return 'Geçerli fiyat girin';
-                                  }
-                                  return null;
-                                },
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildField(
+                                label: 'Alış Fiyatı',
+                                required: true,
+                                child: TextFormField(
+                                  controller: _alisFiyatiController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                      RegExp(r'^\d*\.?\d*'),
+                                    ),
+                                  ],
+                                  decoration: _decoration(
+                                    '250000',
+                                    Icons.payments_outlined,
+                                  ).copyWith(suffixText: '₺'),
+                                  validator: (v) {
+                                    if (v == null || v.isEmpty) {
+                                      return 'Alış fiyatı gerekli';
+                                    }
+                                    final f = tutarCevir(v);
+                                    if (f == null || f <= 0) {
+                                      return '0’dan büyük fiyat girin';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildField(
-                              label: 'Alış Tarihi',
-                              child: InkWell(
-                                onTap: _selectDate,
-                                borderRadius: BorderRadius.circular(10),
-                                child: InputDecorator(
-                                  decoration: _decoration('Tarih seçin',
-                                      Icons.date_range_outlined),
-                                  child: Text(
-                                    _alisTarihi != null
-                                        ? _dateFormat.format(_alisTarihi!)
-                                        : 'Tarih seçin',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      color: _alisTarihi != null
-                                          ? AppTheme.textPrimary
-                                          : AppTheme.textMuted,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildField(
+                                label: 'Alış Tarihi',
+                                child: InkWell(
+                                  onTap: _selectDate,
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: InputDecorator(
+                                    decoration: _decoration(
+                                      'Tarih seçin',
+                                      Icons.date_range_outlined,
+                                    ),
+                                    child: Text(
+                                      _alisTarihi != null
+                                          ? _dateFormat.format(_alisTarihi!)
+                                          : 'Tarih seçin',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        color: _alisTarihi != null
+                                            ? AppTheme.textPrimary
+                                            : AppTheme.textMuted,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          const Expanded(child: SizedBox()),
-                        ]),
+                            const Expanded(child: SizedBox()),
+                          ],
+                        ),
                       // Satıldı durumundaki araçta durum değiştirilemez
                       if (!_isSold) ...[
                         const SizedBox(height: 16),
@@ -618,23 +675,30 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 10),
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: AppTheme.successBg,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                                color: AppTheme.success.withValues(alpha: 0.3)),
+                              color: AppTheme.success.withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.check_circle_outline_rounded,
-                                  size: 16, color: AppTheme.success),
+                              const Icon(
+                                Icons.check_circle_outline_rounded,
+                                size: 16,
+                                color: AppTheme.success,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'Bu araç satıldı. Durum araç detay ekranından değiştirilemez.',
                                 style: GoogleFonts.inter(
-                                    fontSize: 12.5,
-                                    color: AppTheme.successText),
+                                  fontSize: 12.5,
+                                  color: AppTheme.successText,
+                                ),
                               ),
                             ],
                           ),
@@ -655,7 +719,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                           child: TextFormField(
                             controller: _saticiAdiController,
                             decoration: _decoration(
-                                'Ad Soyad', Icons.badge_outlined),
+                              'Ad Soyad',
+                              Icons.badge_outlined,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -665,7 +731,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                             controller: _saticiTelefonController,
                             keyboardType: TextInputType.phone,
                             decoration: _decoration(
-                                '05XX XXX XX XX', Icons.phone_outlined),
+                              '05XX XXX XX XX',
+                              Icons.phone_outlined,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -674,52 +742,60 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                           child: TextFormField(
                             controller: _saticiAdresController,
                             maxLines: 2,
-                            decoration: _decoration(
-                                    'Mahalle, ilçe, şehir...',
-                                    Icons.location_on_outlined)
-                                .copyWith(
-                              prefixIcon: null,
-                              alignLabelWithHint: true,
-                            ),
+                            decoration:
+                                _decoration(
+                                  'Mahalle, ilçe, şehir...',
+                                  Icons.location_on_outlined,
+                                ).copyWith(
+                                  prefixIcon: null,
+                                  alignLabelWithHint: true,
+                                ),
                           ),
                         ),
                       ] else ...[
-                        Row(children: [
-                          Expanded(
-                            child: _buildField(
-                              label: 'Satıcı Adı Soyadı',
-                              child: TextFormField(
-                                controller: _saticiAdiController,
-                                decoration: _decoration(
-                                    'Ad Soyad', Icons.badge_outlined),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildField(
+                                label: 'Satıcı Adı Soyadı',
+                                child: TextFormField(
+                                  controller: _saticiAdiController,
+                                  decoration: _decoration(
+                                    'Ad Soyad',
+                                    Icons.badge_outlined,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildField(
-                              label: 'Telefon',
-                              child: TextFormField(
-                                controller: _saticiTelefonController,
-                                keyboardType: TextInputType.phone,
-                                decoration: _decoration('05XX XXX XX XX',
-                                    Icons.phone_outlined),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildField(
+                                label: 'Telefon',
+                                child: TextFormField(
+                                  controller: _saticiTelefonController,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: _decoration(
+                                    '05XX XXX XX XX',
+                                    Icons.phone_outlined,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildField(
-                              label: 'Adres',
-                              child: TextFormField(
-                                controller: _saticiAdresController,
-                                decoration: _decoration(
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildField(
+                                label: 'Adres',
+                                child: TextFormField(
+                                  controller: _saticiAdresController,
+                                  decoration: _decoration(
                                     'Mahalle, ilçe, şehir...',
-                                    Icons.location_on_outlined),
+                                    Icons.location_on_outlined,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ]),
+                          ],
+                        ),
                       ],
                     ],
                   ),
@@ -734,12 +810,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                         controller: _notlarController,
                         maxLines: 3,
                         decoration: _decoration(
-                                'Araçla ilgili notlarınızı buraya yazın...',
-                                Icons.notes_outlined)
-                            .copyWith(
-                          prefixIcon: null,
-                          alignLabelWithHint: true,
-                        ),
+                          'Araçla ilgili notlarınızı buraya yazın...',
+                          Icons.notes_outlined,
+                        ).copyWith(prefixIcon: null, alignLabelWithHint: true),
                       ),
                     ],
                   ),
@@ -758,8 +831,11 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.error_outline_rounded,
-                              color: AppTheme.error, size: 20),
+                          const Icon(
+                            Icons.error_outline_rounded,
+                            color: AppTheme.error,
+                            size: 20,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
@@ -772,10 +848,12 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () =>
-                                setState(() => _errorMessage = null),
-                            child: const Icon(Icons.close_rounded,
-                                size: 16, color: AppTheme.error),
+                            onTap: () => setState(() => _errorMessage = null),
+                            child: const Icon(
+                              Icons.close_rounded,
+                              size: 16,
+                              color: AppTheme.error,
+                            ),
                           ),
                         ],
                       ),
@@ -797,24 +875,29 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                     width: 16,
                                     height: 16,
                                     child: CircularProgressIndicator(
-                                        color: Colors.white, strokeWidth: 2),
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : Icon(
                                     _isEditing
                                         ? Icons.save_rounded
                                         : Icons.add_rounded,
-                                    size: 18),
+                                    size: 18,
+                                  ),
                             label: Text(
                               _isEditing
                                   ? 'Değişiklikleri Kaydet'
                                   : 'Araç Ekle',
                               style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w600),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             style: FilledButton.styleFrom(
                               backgroundColor: AppTheme.primary,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
                         ),
@@ -827,11 +910,15 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                               foregroundColor: AppTheme.textSecondary,
                               side: const BorderSide(color: AppTheme.border),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            child: Text('İptal',
-                                style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w500)),
+                            child: Text(
+                              'İptal',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -846,13 +933,19 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                             foregroundColor: AppTheme.textSecondary,
                             side: const BorderSide(color: AppTheme.border),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 13),
+                              horizontal: 24,
+                              vertical: 13,
+                            ),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          child: Text('İptal',
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500)),
+                          child: Text(
+                            'İptal',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         SizedBox(
@@ -864,26 +957,33 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                     width: 16,
                                     height: 16,
                                     child: CircularProgressIndicator(
-                                        color: Colors.white, strokeWidth: 2),
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : Icon(
                                     _isEditing
                                         ? Icons.save_rounded
                                         : Icons.add_rounded,
-                                    size: 18),
+                                    size: 18,
+                                  ),
                             label: Text(
                               _isEditing
                                   ? 'Değişiklikleri Kaydet'
                                   : 'Araç Ekle',
                               style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w600),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             style: FilledButton.styleFrom(
                               backgroundColor: AppTheme.primary,
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 13),
+                                horizontal: 24,
+                                vertical: 13,
+                              ),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
                           ),
                         ),
@@ -900,8 +1000,20 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
 
   Widget _buildDurumSelector() {
     const options = [
-      ('stokta', 'Stokta', Icons.inventory_2_outlined, AppTheme.primary, AppTheme.primaryLight),
-      ('rezerve', 'Rezerve', Icons.schedule_rounded, AppTheme.warning, AppTheme.warningBg),
+      (
+        'stokta',
+        'Stokta',
+        Icons.inventory_2_outlined,
+        AppTheme.primary,
+        AppTheme.primaryLight,
+      ),
+      (
+        'rezerve',
+        'Rezerve',
+        Icons.schedule_rounded,
+        AppTheme.warning,
+        AppTheme.warningBg,
+      ),
     ];
 
     return Row(
@@ -918,7 +1030,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 12),
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? bg : AppTheme.bgMuted,
                   borderRadius: BorderRadius.circular(10),
@@ -931,9 +1045,11 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(icon,
-                        size: 18,
-                        color: isSelected ? color : AppTheme.textMuted),
+                    Icon(
+                      icon,
+                      size: 18,
+                      color: isSelected ? color : AppTheme.textMuted,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       label,
@@ -947,8 +1063,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                     ),
                     if (isSelected) ...[
                       const Spacer(),
-                      Icon(Icons.check_circle_rounded,
-                          size: 16, color: color),
+                      Icon(Icons.check_circle_rounded, size: 16, color: color),
                     ],
                   ],
                 ),
@@ -1030,8 +1145,10 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
             ),
             if (required) ...[
               const SizedBox(width: 3),
-              const Text('*',
-                  style: TextStyle(color: AppTheme.error, fontSize: 13)),
+              const Text(
+                '*',
+                style: TextStyle(color: AppTheme.error, fontSize: 13),
+              ),
             ],
           ],
         ),
@@ -1064,20 +1181,19 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
       style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle:
-            GoogleFonts.inter(fontSize: 14, color: AppTheme.textMuted),
+        hintStyle: GoogleFonts.inter(fontSize: 14, color: AppTheme.textMuted),
         prefixIcon: leading != null
             ? Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: leading,
               )
             : Icon(icon, size: 17, color: AppTheme.textMuted),
-        prefixIconConstraints: const BoxConstraints(
-          minWidth: 42,
-          minHeight: 0,
+        prefixIconConstraints: const BoxConstraints(minWidth: 42, minHeight: 0),
+        suffixIcon: const Icon(
+          Icons.expand_more_rounded,
+          size: 18,
+          color: AppTheme.textMuted,
         ),
-        suffixIcon: const Icon(Icons.expand_more_rounded,
-            size: 18, color: AppTheme.textMuted),
       ),
       validator: validator,
     );

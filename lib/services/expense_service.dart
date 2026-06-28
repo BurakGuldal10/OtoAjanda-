@@ -43,22 +43,25 @@ class ExpenseService {
 
   // Gider güncelle
   Future<Expense> updateExpense(Expense expense) async {
+    final userId = _userId;
     final response = await _client
         .from('expenses')
         .update(expense.toJson(forUpdate: true))
         .eq('id', expense.id!)
+        .eq('user_id', userId)
         .select()
         .single();
 
     final saved = Expense.fromJson(response);
-    LocalBackupService.triggerBackup(_userId).ignore();
+    LocalBackupService.triggerBackup(userId).ignore();
     return saved;
   }
 
   // Gider sil
   Future<void> deleteExpense(String id) async {
-    await _client.from('expenses').delete().eq('id', id);
-    LocalBackupService.triggerBackup(_userId).ignore();
+    final userId = _userId;
+    await _client.from('expenses').delete().eq('id', id).eq('user_id', userId);
+    LocalBackupService.triggerBackup(userId).ignore();
   }
 
   // Araca ait toplam gider
@@ -69,7 +72,8 @@ class ExpenseService {
 
   // Birden fazla araç için toplam giderleri vehicle_id bazında getir
   Future<Map<String, double>> getTotalExpensesByVehicles(
-      List<String> vehicleIds) async {
+    List<String> vehicleIds,
+  ) async {
     if (vehicleIds.isEmpty) return {};
     final response = await _client
         .from('expenses')

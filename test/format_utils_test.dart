@@ -12,8 +12,23 @@ void main() {
       expect(tutarCevir('1500,50'), 1500.5);
     });
 
+    test('Türkçe binlik ayraçlı tam sayıyı ayrıştırır', () {
+      expect(tutarCevir('150.000'), 150000);
+      expect(tutarCevir('1.250.000'), 1250000);
+    });
+
+    test('Türkçe binlik ve ondalık ayraçlarını birlikte ayrıştırır', () {
+      expect(tutarCevir('1.250,50'), 1250.5);
+      expect(tutarCevir('1.250.000,75'), 1250000.75);
+    });
+
     test('noktalı ondalığı ayrıştırır', () {
       expect(tutarCevir('1500.50'), 1500.5);
+    });
+
+    test('uluslararası binlik ve ondalık ayraçlarını ayrıştırır', () {
+      expect(tutarCevir('1,250.50'), 1250.5);
+      expect(tutarCevir('1,250,000.75'), 1250000.75);
     });
 
     test('para simgesi ve boşlukları yok sayar', () {

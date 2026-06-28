@@ -54,35 +54,40 @@ class VehicleService {
 
   // Araç güncelle
   Future<Vehicle> updateVehicle(Vehicle vehicle) async {
+    final userId = _userId;
     final response = await _client
         .from('vehicles')
         .update(vehicle.toJson(forUpdate: true))
         .eq('id', vehicle.id!)
+        .eq('user_id', userId)
         .select()
         .single();
 
     final saved = Vehicle.fromJson(response);
-    LocalBackupService.triggerBackup(_userId).ignore();
+    LocalBackupService.triggerBackup(userId).ignore();
     return saved;
   }
 
   // Araç sil
   Future<void> deleteVehicle(String id) async {
-    await _client.from('vehicles').delete().eq('id', id);
-    LocalBackupService.triggerBackup(_userId).ignore();
+    final userId = _userId;
+    await _client.from('vehicles').delete().eq('id', id).eq('user_id', userId);
+    LocalBackupService.triggerBackup(userId).ignore();
   }
 
   // Araç durumunu güncelle (stokta ↔ rezerve)
   Future<Vehicle> updateStatus(String vehicleId, String durum) async {
+    final userId = _userId;
     final response = await _client
         .from('vehicles')
         .update({'durum': durum})
         .eq('id', vehicleId)
+        .eq('user_id', userId)
         .select()
         .single();
 
     final saved = Vehicle.fromJson(response);
-    LocalBackupService.triggerBackup(_userId).ignore();
+    LocalBackupService.triggerBackup(userId).ignore();
     return saved;
   }
 
@@ -95,6 +100,7 @@ class VehicleService {
     String? aliciTelefon,
     String? aliciAdres,
   }) async {
+    final userId = _userId;
     final response = await _client
         .from('vehicles')
         .update({
@@ -106,11 +112,12 @@ class VehicleService {
           'alici_adres': aliciAdres,
         })
         .eq('id', vehicleId)
+        .eq('user_id', userId)
         .select()
         .single();
 
     final saved = Vehicle.fromJson(response);
-    LocalBackupService.triggerBackup(_userId).ignore();
+    LocalBackupService.triggerBackup(userId).ignore();
     return saved;
   }
 
