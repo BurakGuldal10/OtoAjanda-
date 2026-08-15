@@ -6,7 +6,7 @@ String friendlyAuthError(dynamic error) {
   if (msg.contains('email not confirmed') ||
       msg.contains('email_not_confirmed')) {
     return 'E-posta adresiniz henüz onaylanmamış.\n'
-        'Supabase panelinden "Email confirmations" seçeneğini kapatın veya gelen kutunuzu kontrol edin.';
+        'Gelen kutunuzu ve spam klasörünü kontrol edin.';
   }
 
   // Yanlış e-posta / şifre
@@ -27,8 +27,7 @@ String friendlyAuthError(dynamic error) {
   }
 
   // Kayıt kapalı
-  if (msg.contains('signups not allowed') ||
-      msg.contains('signup_disabled')) {
+  if (msg.contains('signups not allowed') || msg.contains('signup_disabled')) {
     return 'Yeni kayıt şu an kapalı. Lütfen daha sonra tekrar deneyin.';
   }
 
@@ -43,7 +42,7 @@ String friendlyAuthError(dynamic error) {
   if (msg.contains('weak password') ||
       msg.contains('password should be') ||
       msg.contains('at least')) {
-    return 'Şifreniz çok zayıf. En az 6 karakter kullanın.';
+    return 'Şifreniz çok zayıf. En az 10 karakter kullanın.';
   }
 
   // Rate limit (çok fazla deneme)
@@ -62,8 +61,7 @@ String friendlyAuthError(dynamic error) {
   }
 
   // Geçersiz e-posta formatı
-  if (msg.contains('invalid email') ||
-      msg.contains('email_address_invalid')) {
+  if (msg.contains('invalid email') || msg.contains('email_address_invalid')) {
     return 'Geçersiz e-posta adresi. Lütfen doğru bir adres girin.';
   }
 

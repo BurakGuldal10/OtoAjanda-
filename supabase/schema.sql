@@ -238,26 +238,61 @@ create policy "expenses_select_own"
   on public.expenses
   for select
   to authenticated
-  using ((select auth.uid()) = user_id);
+  using (
+    (select auth.uid()) = user_id
+    and exists (
+      select 1 from public.vehicles vehicle
+      where vehicle.id = expenses.vehicle_id
+        and vehicle.user_id = (select auth.uid())
+    )
+  );
 
 create policy "expenses_insert_own"
   on public.expenses
   for insert
   to authenticated
-  with check ((select auth.uid()) = user_id);
+  with check (
+    (select auth.uid()) = user_id
+    and exists (
+      select 1 from public.vehicles vehicle
+      where vehicle.id = expenses.vehicle_id
+        and vehicle.user_id = (select auth.uid())
+    )
+  );
 
 create policy "expenses_update_own"
   on public.expenses
   for update
   to authenticated
-  using ((select auth.uid()) = user_id)
-  with check ((select auth.uid()) = user_id);
+  using (
+    (select auth.uid()) = user_id
+    and exists (
+      select 1 from public.vehicles vehicle
+      where vehicle.id = expenses.vehicle_id
+        and vehicle.user_id = (select auth.uid())
+    )
+  )
+  with check (
+    (select auth.uid()) = user_id
+    and exists (
+      select 1 from public.vehicles vehicle
+      where vehicle.id = expenses.vehicle_id
+        and vehicle.user_id = (select auth.uid())
+    )
+  );
 
 create policy "expenses_delete_own"
   on public.expenses
   for delete
   to authenticated
-  using ((select auth.uid()) = user_id);
+  using (
+    (select auth.uid()) = user_id
+    and exists (
+      select 1 from public.vehicles vehicle
+      where vehicle.id = expenses.vehicle_id
+        and vehicle.user_id = (select auth.uid())
+    )
+  );
 
 drop policy if exists "price_estimates_select_own" on public.price_estimates;
 drop policy if exists "price_estimates_insert_own" on public.price_estimates;
@@ -268,26 +303,76 @@ create policy "price_estimates_select_own"
   on public.price_estimates
   for select
   to authenticated
-  using ((select auth.uid()) = user_id);
+  using (
+    (select auth.uid()) = user_id
+    and (
+      vehicle_id is null
+      or exists (
+        select 1 from public.vehicles vehicle
+        where vehicle.id = price_estimates.vehicle_id
+          and vehicle.user_id = (select auth.uid())
+      )
+    )
+  );
 
 create policy "price_estimates_insert_own"
   on public.price_estimates
   for insert
   to authenticated
-  with check ((select auth.uid()) = user_id);
+  with check (
+    (select auth.uid()) = user_id
+    and (
+      vehicle_id is null
+      or exists (
+        select 1 from public.vehicles vehicle
+        where vehicle.id = price_estimates.vehicle_id
+          and vehicle.user_id = (select auth.uid())
+      )
+    )
+  );
 
 create policy "price_estimates_update_own"
   on public.price_estimates
   for update
   to authenticated
-  using ((select auth.uid()) = user_id)
-  with check ((select auth.uid()) = user_id);
+  using (
+    (select auth.uid()) = user_id
+    and (
+      vehicle_id is null
+      or exists (
+        select 1 from public.vehicles vehicle
+        where vehicle.id = price_estimates.vehicle_id
+          and vehicle.user_id = (select auth.uid())
+      )
+    )
+  )
+  with check (
+    (select auth.uid()) = user_id
+    and (
+      vehicle_id is null
+      or exists (
+        select 1 from public.vehicles vehicle
+        where vehicle.id = price_estimates.vehicle_id
+          and vehicle.user_id = (select auth.uid())
+      )
+    )
+  );
 
 create policy "price_estimates_delete_own"
   on public.price_estimates
   for delete
   to authenticated
-  using ((select auth.uid()) = user_id);
+  using (
+    (select auth.uid()) = user_id
+    and (
+      vehicle_id is null
+      or exists (
+        select 1 from public.vehicles vehicle
+        where vehicle.id = price_estimates.vehicle_id
+          and vehicle.user_id = (select auth.uid())
+      )
+    )
+  );
 
 -- ---------------------------------------------------------------------------
 -- Auth trigger: create profile row when a user signs up
@@ -320,4 +405,3 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
-

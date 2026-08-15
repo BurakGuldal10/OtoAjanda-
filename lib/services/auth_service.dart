@@ -30,6 +30,10 @@ class AuthService {
     required String password,
     required String galeriAdi,
   }) async {
+    if (password.length < 10) {
+      throw const AuthException('Password should be at least 10 characters.');
+    }
+
     final response = await _client.auth.signUp(
       email: email,
       password: password,
@@ -38,9 +42,7 @@ class AuthService {
 
     final user = response.user;
     if (user == null) {
-      throw const AuthException(
-        'Kayıt oluşturulamadı. Lütfen tekrar deneyin.',
-      );
+      throw const AuthException('Kayıt oluşturulamadı. Lütfen tekrar deneyin.');
     }
 
     final needsEmailConfirmation = response.session == null;
@@ -100,8 +102,7 @@ class AuthService {
           .maybeSingle();
       if (existing != null) return;
 
-      final galeriAdi =
-          (user.userMetadata?['galeri_adi'] as String?)?.trim();
+      final galeriAdi = (user.userMetadata?['galeri_adi'] as String?)?.trim();
       await _client.from('profiles').insert({
         'id': user.id,
         if (galeriAdi != null && galeriAdi.isNotEmpty) 'galeri_adi': galeriAdi,

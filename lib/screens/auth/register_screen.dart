@@ -41,7 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (mounted) {
         final msg = result.needsEmailConfirmation
             ? 'Kayıt oluşturuldu! E-posta adresinize gönderilen onay linkine '
-                'tıkladıktan sonra giriş yapabilirsiniz.'
+                  'tıkladıktan sonra giriş yapabilirsiniz.'
             : 'Kayıt başarılı! Giriş yapabilirsiniz.';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -84,8 +84,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                decoration:
-                    const BoxDecoration(gradient: AppTheme.authGradient),
+                decoration: const BoxDecoration(
+                  gradient: AppTheme.authGradient,
+                ),
                 padding: const EdgeInsets.fromLTRB(28, 48, 28, 36),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,10 +141,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Expanded(
             flex: 42,
             child: Container(
-              decoration:
-                  const BoxDecoration(gradient: AppTheme.authGradient),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 52, vertical: 44),
+              decoration: const BoxDecoration(gradient: AppTheme.authGradient),
+              padding: const EdgeInsets.symmetric(horizontal: 52, vertical: 44),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -177,12 +176,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const Spacer(flex: 3),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 7),
+                      horizontal: 14,
+                      vertical: 7,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.08)),
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
                     ),
                     child: Text(
                       'Ücretsiz  ·  Supabase bulut altyapısı',
@@ -205,7 +207,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 48, vertical: 44),
+                    horizontal: 48,
+                    vertical: 44,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,10 +257,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const SizedBox(height: 6),
           TextFormField(
             controller: _galeriAdiController,
-            style: GoogleFonts.inter(
-                fontSize: 14, color: AppTheme.textPrimary),
-            decoration: _inputDecoration(
-                'ABC Otomotiv', Icons.store_outlined),
+            style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textPrimary),
+            decoration: _inputDecoration('ABC Otomotiv', Icons.store_outlined),
             validator: (v) =>
                 v == null || v.isEmpty ? 'Galeri adı gerekli' : null,
           ),
@@ -266,10 +268,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            style: GoogleFonts.inter(
-                fontSize: 14, color: AppTheme.textPrimary),
+            style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textPrimary),
             decoration: _inputDecoration(
-                'ornek@email.com', Icons.email_outlined),
+              'ornek@email.com',
+              Icons.email_outlined,
+            ),
             validator: (v) {
               if (v == null || v.isEmpty) return 'E-posta gerekli';
               if (!v.contains('@')) return 'Geçerli bir e-posta girin';
@@ -282,26 +285,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
           TextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
-            style: GoogleFonts.inter(
-                fontSize: 14, color: AppTheme.textPrimary),
-            decoration: _inputDecoration(
-                    '••••••••', Icons.lock_outlined)
+            style: GoogleFonts.inter(fontSize: 14, color: AppTheme.textPrimary),
+            decoration: _inputDecoration('••••••••', Icons.lock_outlined)
                 .copyWith(
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  size: 18,
-                  color: AppTheme.textMuted,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      size: 18,
+                      color: AppTheme.textMuted,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
+                  ),
                 ),
-                onPressed: () =>
-                    setState(() => _obscurePassword = !_obscurePassword),
-              ),
-            ),
             validator: (v) {
               if (v == null || v.isEmpty) return 'Şifre gerekli';
-              if (v.length < 6) return 'En az 6 karakter gerekli';
+              if (v.length < 10) return 'En az 10 karakter gerekli';
               return null;
             },
           ),
@@ -316,14 +317,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               child: _isLoading
                   ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2),
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
                   : Text(
                       'Hesap Oluştur',
@@ -344,7 +348,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Text(
                 'Hesabınız var mı? ',
                 style: GoogleFonts.inter(
-                    fontSize: 14, color: AppTheme.textSecondary),
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
+                ),
               ),
               GestureDetector(
                 onTap: widget.onToggle,
@@ -373,11 +379,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: Colors.white.withValues(alpha: 0.15)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
           ),
-          child: const Icon(Icons.directions_car_rounded,
-              color: Colors.white, size: 20),
+          child: const Icon(
+            Icons.directions_car_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
         ),
         const SizedBox(width: 12),
         Text(
@@ -403,7 +411,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             color: AppTheme.primaryMid.withValues(alpha: 0.25),
             shape: BoxShape.circle,
             border: Border.all(
-                color: AppTheme.primaryMid.withValues(alpha: 0.4)),
+              color: AppTheme.primaryMid.withValues(alpha: 0.4),
+            ),
           ),
           child: Center(
             child: Text(
@@ -420,7 +429,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Text(
           text,
           style: GoogleFonts.inter(
-              color: const Color(0xFFCBD5E1), fontSize: 14),
+            color: const Color(0xFFCBD5E1),
+            fontSize: 14,
+          ),
         ),
       ],
     );

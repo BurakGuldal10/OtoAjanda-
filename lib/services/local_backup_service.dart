@@ -1,46 +1,31 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../config/supabase_config.dart';
 import '../models/expense.dart';
 import '../models/vehicle.dart';
+import '../utils/backup_crypto.dart';
 
-/// Araç ve gider verilerinin yerel JSON yedeğini yönetir.
+/// Araç ve gider verilerinin şifreli yerel yedeğini yönetir.
 /// DB işlemlerinden sonra arka planda çağrılır; hata uygulamayı durdurmaz.
-///
-/// Platform bazlı yedek konumları:
-///   Windows : Documents\GaleriPro\yedek.json
-///   macOS   : Documents/GaleriPro/yedek.json
-///   Linux   : Documents/GaleriPro/yedek.json
-///   Android : /sdcard/Android/data/PAKET/files/GaleriPro/yedek.json  (dosya yöneticisinden erişilebilir)
-///   iOS     : Uygulama Documents dizini (Files uygulamasından erişilebilir)
 class LocalBackupService {
   static final _client = SupabaseConfig.client;
+  static const _secureStorage = FlutterSecureStorage();
 
   static const _appFolder = 'GaleriPro';
-  static const _fileName = 'yedek.json';
+  static const _fileName = 'yedek.gpb';
+  static const _legacyFileName = 'yedek.json';
+  static const _keyName = 'galeripro_backup_key_v1';
 
   // ── Dizin seçimi ──────────────────────────────────────────────────
 
   static Future<Directory> _backupDir() async {
-    final Directory baseDir;
-
-    if (Platform.isAndroid) {
-      // Android: harici uygulama dizini — dosya yöneticisinde görünür,
-      // API 29+ için izin gerekmez (uygulama özel alan).
-      // Harici depolama yoksa (emülatör vb.) dahili dizine düşer.
-      baseDir =
-          (await getExternalStorageDirectory()) ??
-          await getApplicationDocumentsDirectory();
-    } else {
-      // iOS     : Files uygulamasından erişilebilir (Info.plist ile etkinleştirildi)
-      // Windows : C:\Users\USERNAME\Documents\
-      // macOS   : /Users/USERNAME/Documents/
-      // Linux   : /home/USERNAME/Documents/
-      baseDir = await getApplicationDocumentsDirectory();
-    }
+    final baseDir = await getApplicationSupportDirectory();
 
     final dir = Directory(
       [baseDir.path, _appFolder].join(Platform.pathSeparator),
@@ -151,6 +136,49 @@ class LocalBackupService {
     };
 
     const encoder = JsonEncoder.withIndent('  ');
-    await File(filePath).writeAsString(encoder.convert(snapshot), flush: true);
+    final encrypted = await _encrypt(utf8.encode(encoder.convert(snapshot)));
+    await File(filePath).writeAsString(jsonEncode(encrypted), flush: true);
+    await _removeLegacyPlaintextBackup();
+  }
+
+  static Future<Map<String, Object>> _encrypt(List<int> plaintext) async {
+    final key = await _getOrCreateEncryptionKey();
+    final nonce = _randomBytes(12);
+    return BackupCrypto.encrypt(
+      plaintext: Uint8List.fromList(plaintext),
+      key: key,
+      nonce: nonce,
+    );
+  }
+
+  static Future<Uint8List> _getOrCreateEncryptionKey() async {
+    final storedKey = await _secureStorage.read(key: _keyName);
+    if (storedKey != null) return base64Decode(storedKey);
+
+    final key = _randomBytes(32);
+    await _secureStorage.write(key: _keyName, value: base64Encode(key));
+    return key;
+  }
+
+  static Uint8List _randomBytes(int length) {
+    final random = Random.secure();
+    return Uint8List.fromList(
+      List<int>.generate(length, (_) => random.nextInt(256)),
+    );
+  }
+
+  static Future<void> _removeLegacyPlaintextBackup() async {
+    final legacyRoots = <Directory>[await getApplicationDocumentsDirectory()];
+    if (Platform.isAndroid) {
+      final externalDirectory = await getExternalStorageDirectory();
+      if (externalDirectory != null) legacyRoots.add(externalDirectory);
+    }
+
+    for (final root in legacyRoots) {
+      final legacyFile = File(
+        [root.path, _appFolder, _legacyFileName].join(Platform.pathSeparator),
+      );
+      if (await legacyFile.exists()) await legacyFile.delete();
+    }
   }
 }

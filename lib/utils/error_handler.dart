@@ -69,8 +69,7 @@ class AppError {
     if (m.contains('email not confirmed') ||
         m.contains('email_not_confirmed')) {
       return 'E-posta adresiniz henüz onaylanmamış.\n'
-          'Çözüm: Supabase paneli → Authentication → Settings → '
-          '"Enable email confirmations" seçeneğini kapatın.';
+          'Gelen kutunuzu ve spam klasörünü kontrol edin.';
     }
     if (m.contains('invalid login credentials') ||
         m.contains('invalid_credentials') ||
@@ -87,8 +86,7 @@ class AppError {
           'Çözüm: Supabase paneli → Authentication → Providers → '
           'Email → "Enable" seçeneğini aktif edin.';
     }
-    if (m.contains('signups not allowed') ||
-        m.contains('signup_disabled')) {
+    if (m.contains('signups not allowed') || m.contains('signup_disabled')) {
       return 'Yeni kayıt şu an kapalı.\n'
           'Çözüm: Supabase paneli → Authentication → Settings → '
           '"Enable signups" seçeneğini aktif edin.';
@@ -100,7 +98,7 @@ class AppError {
           'Giriş yapmayı deneyin ya da farklı bir e-posta kullanın.';
     }
     if (m.contains('weak password') || m.contains('password should be')) {
-      return 'Şifre çok kısa. En az 6 karakter kullanın.';
+      return 'Şifre çok kısa. En az 10 karakter kullanın.';
     }
     if (m.contains('rate limit') ||
         m.contains('too many requests') ||
@@ -115,8 +113,7 @@ class AppError {
         m.contains('no session')) {
       return 'Oturumunuz bulunamadı. Lütfen tekrar giriş yapın.';
     }
-    if (m.contains('invalid email') ||
-        m.contains('email_address_invalid')) {
+    if (m.contains('invalid email') || m.contains('email_address_invalid')) {
       return 'Geçersiz e-posta adresi. Lütfen doğru bir adres girin.';
     }
     if (statusCode != null && statusCode.startsWith('5')) {
