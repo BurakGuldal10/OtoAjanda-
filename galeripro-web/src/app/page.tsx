@@ -109,7 +109,9 @@ export default function Home() {
               Kayıt Ol
             </a>
             <a
-              href="#indir"
+              href="https://sfcumafkxhndjuukbodn.supabase.co/storage/v1/object/public/downloads/GaleriPro-Windows.zip"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center space-x-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition shadow-sm"
             >
               <Download className="w-4 h-4" />
@@ -165,17 +167,19 @@ export default function Home() {
               {/* İndirme Butonu Alanı */}
               <div id="indir" className="pt-6">
                 <a
-                  href="/download/GaleriPro-Setup.exe"
+                  href="https://sfcumafkxhndjuukbodn.supabase.co/storage/v1/object/public/downloads/GaleriPro-Windows.zip"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center space-x-3 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3.5 rounded-xl font-semibold shadow-lg shadow-slate-900/10 transition transform active:scale-95"
                 >
                   <Download className="w-5 h-5 text-blue-400" />
                   <div className="text-left">
-                    <div className="text-xs text-slate-400">Windows için hazır</div>
-                    <div className="text-sm font-bold">GaleriPro v1.0 İndir (.exe)</div>
+                    <div className="text-xs text-slate-400">Windows için hazır (16.4 MB)</div>
+                    <div className="text-sm font-bold">GaleriPro v1.0 İndir (.zip)</div>
                   </div>
                 </a>
                 <p className="text-xs text-slate-400 mt-2">
-                  * 64-bit Windows 10 ve Windows 11 uyumludur. Kurulum gerektirmeden çalışır.
+                  * İndirilen zip dosyasını klasöre çıkartıp içindeki <strong>oto_galeri_app.exe</strong> dosyasına çift tıklayarak hemen kullanabilirsiniz.
                 </p>
               </div>
             </div>
